@@ -35,8 +35,8 @@ def ELA(filenameInput, filenameOutput):
     imNew.save(filenameOutput)
 
 def Main():
-    file_in = "images/ps_test.jpg"
-    file_out = "images/ps_ela.jpg"
+    file_in = "images/sensationalist_test.jpg"
+    file_out = "images/sensationalist_ela.jpg"
     ELA(file_in, file_out)
 
 if __name__ == '__main__':
