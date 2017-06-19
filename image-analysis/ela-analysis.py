@@ -5,6 +5,9 @@
 import optparse
 import cStringIO
 from PIL import Image
+import os
+import glob
+
 
 class elaAnalsys():
     def __init__(self, trigger, enhance, coloronly):
@@ -17,6 +20,7 @@ class elaAnalsys():
             return tuple([x * self.enhance for x in pixelDiff])
         else:
             return (0, 0, 0)
+
 
 def ELA(filenameInput, filenameOutput):
     coloronly = False
@@ -34,10 +38,19 @@ def ELA(filenameInput, filenameOutput):
     imNew.putdata(map(oELA.CalculateELA, imOriginal.getdata(), imJPEGSaved.getdata()))
     imNew.save(filenameOutput)
 
-def Main():
-    file_in = "images/sensationalist_test.jpg"
-    file_out = "images/sensationalist_ela.jpg"
-    ELA(file_in, file_out)
 
 if __name__ == '__main__':
-    Main()
+    f = []
+    path = 'images/ps-battles/originals'
+    out_path = os.path.join(path, 'ela')
+
+    for root, dirs, files in os.walk(path):
+        for idx, f in enumerate(files):
+            if not f.find('.jpg'): 
+                continue
+            else:
+                print("Processing file: {} / {}".format(idx, len(files)))
+                file_in = os.path.join(path, f)
+                file_out = os.path.join(out_path, f)
+
+                ELA(file_in, file_out)

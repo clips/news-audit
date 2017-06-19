@@ -20,12 +20,13 @@ def extract_photoshopped_images(comment_link, count):
       pass
 
 
-
 def find_pictures():
   r = requests.get('https://www.reddit.com/r/photoshopbattles/').text
   soup = BS(r, 'html.parser')
   entries = soup.find_all('div', class_='entry')
   count = 0
+
+  print r
 
   for entry in entries:
     temp = entry.find_all('p', class_='title')
