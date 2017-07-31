@@ -39,12 +39,12 @@ class Punct_Stats(BaseEstimator, TransformerMixin):
     def fit(self, x, y=None):
         return self
 
-    def transform(self, pos_fields):
+    def transform(self, text_fields):
         punct_stats = []
         punctuations = list(string.punctuation)
         additional_punc = ['``', '--', '\'\'']
         punctuations.extend(additional_punc)
-        for field in pos_fields:
+        for field in text_fields:
             puncts = defaultdict(int)
             for ch in field:
                 if ch in punctuations:
