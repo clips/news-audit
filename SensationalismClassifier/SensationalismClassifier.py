@@ -62,11 +62,12 @@ class Text_Stats(BaseEstimator, TransformerMixin):
     def transform(self, text_fields):
         stats = []
         punctuation = string.punctuation
+        abvs = ['CNN', 'FBI', 'ABC', 'MSNBC', 'GOP', 'U.S.', 'US', 'ISIS', 'DNC', 'TV', 'CIA', 'I', 'AP', 'PM', 'AM', 'EU', 'USA', 'UK', 'UN', 'CEO', 'NASA', 'LGBT', 'LGBTQ', 'NAFTA', 'ACLU']
         for field in text_fields:
             field_stats = {}
             tok_text = nltk.word_tokenize(field)
             try:
-                num_upper = float(len([w for w in tok_text if w.isupper()]))/len(tok_text)
+                num_upper = float(len([w for w in tok_text if w.isupper() and w not in abvs]))/len(tok_text)
             except:
                 num_upper = 0
             try:
