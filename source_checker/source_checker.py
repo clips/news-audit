@@ -18,13 +18,15 @@ import sys
 
 class SourceChecker(object):
 
-	def __init__(self, text, max_queries = 10, span = 20, threshold = .8):
+	def __init__(self, text, language, max_queries = 10, span = 20, threshold = .8):
 		self.max_queries = max_queries
 		self.span = span
 		self.threshold = threshold
 		self.text = text
+		self.language = language
 		self.cat_dict = defaultdict(list)
-		self.engine = Google(license='AIzaSyCFgnXgb9rcwJspcSeXHo7QHvucgM2nLrI', throttle=0.5, language=None)
+		key = ''
+		self.engine = Google(license=key, throttle=0.5, language=None)
 
 	def get_queries(self):
 		text = self.text
@@ -41,17 +43,21 @@ class SourceChecker(object):
 		text = text.replace('--', 'DOUBLEDASH')
 
 		all_ngrams = ngrams(text, n = self.span, punctuation = "", continuous = True)
-		stop_words = stopwords.words('english')
+		if self.language in stopwords.fileids():
+			stop_words = stopwords.words(self.language)
+		else:
+			stop_words = []	
 		queries = []
-
 		for ngram in all_ngrams:
 			num_stop = len([w for w in ngram if w in stop_words])
 			stop_score = float(num_stop)/len(ngram)
-
-			chunked = ne_chunk(pos_tag(ngram))
-			named_entities = [[w for w, t in elt] for elt in chunked if isinstance(elt, nltk.Tree)]
-			num_ent = sum([len(ent_list) for ent_list in named_entities])
-			ent_score = float(num_ent)/len(ngram)
+			if self.language == 'english':
+				chunked = ne_chunk(pos_tag(ngram))
+				named_entities = [[w for w, t in elt] for elt in chunked if isinstance(elt, nltk.Tree)]
+				num_ent = sum([len(ent_list) for ent_list in named_entities])
+				ent_score = float(num_ent)/len(ngram)
+			else:
+				ent_score = 0
 
 			if stop_score < self.threshold and ent_score < self.threshold:
 				r_string = self.reconstruct_ngram(ngram)
@@ -168,7 +174,11 @@ class SourceChecker(object):
 def main():
 
 	text = sys.argv[1]
-	sc = SourceChecker(text)
+	try:
+		language = sys.argv[2]
+	except IndexError:
+		language = 'english'
+	sc = SourceChecker(text, language)
 	queries = sc.get_queries()
 	domains = sc.get_urls(queries)
 	sc.load_domains()
@@ -178,18 +188,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
