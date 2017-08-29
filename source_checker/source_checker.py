@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+__author__ = "Masha Ivenskaya"
 from pattern.en import ngrams
 from pattern.web import Google, SEARCH
 from pattern.db import Datasheet
@@ -29,6 +30,11 @@ class SourceChecker(object):
 		self.engine = Google(license=key, throttle=0.5, language=None)
 
 	def get_queries(self):
+
+		"""Function to extract search queries from the text: 
+		breaks text into ngrams, filters ngrams that consist mostly of stopwords or named entities, 
+		selects an evenly spaced sample of the remaining ngrams"""
+
 		text = self.text
 		beg_quotes = re.findall(r'\"\S', text)
 		for each in beg_quotes:
@@ -68,6 +74,9 @@ class SourceChecker(object):
 		return queries[0::reduction]
 		
 	def reconstruct_ngram(self, ngram):
+
+		"""Function to reconstruct original substrings from the ngrams"""
+
 		punc_b = ['!', '?', '.', ',', ';', ':', '\'', ')', ']', '}']
 		punc_a = ['(', '[', '}', '$']
 		ngram = ' '.join(ngram)
@@ -81,6 +90,7 @@ class SourceChecker(object):
 		return ngram 
 
 	def load_domains(self):
+		"""loads domain information"""
 		sources_path = pd('data', 'source_data.csv')
 		domain_file = Datasheet.load(sources_path, headers = True)
 		for row in domain_file:
@@ -93,6 +103,7 @@ class SourceChecker(object):
 	    return izip(it,it)
 
 	def get_urls(self, queries):
+		"""runs search query through search API and collects returned domain information"""
 		domains = defaultdict(list)
 		for q in queries:
 			q = "\"" + q + "\""
@@ -105,6 +116,7 @@ class SourceChecker(object):
 		return domains
 
 	def get_domain(self, full_url):
+		"""function to extract the domain name from the URL"""
 		clean_reg= re.compile(r'^((?:https?:\/\/)?(?:www\.)?).*?(\/.*)?$')
 		match = re.search(clean_reg, full_url)
 		beg, end = match.group(1), match.group(2)
@@ -113,6 +125,7 @@ class SourceChecker(object):
 		return domain
 
 	def render_output(self, domains):
+		"""renders text output"""
 		output = defaultdict(list)
 		for d,v in domains.items():
 			d_cats = [c for c in self.cat_dict[d] if len(c)>0 and len(c.split(' '))<3]
@@ -136,6 +149,7 @@ class SourceChecker(object):
 				print '\n'
 
 	def render_graph(self, domains):
+		"""renders graph output"""
 		g = Graph()
 		for domain in domains.keys():
 			if domain in self.cat_dict:
