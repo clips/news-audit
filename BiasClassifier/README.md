@@ -4,7 +4,7 @@ This classifier takes as input a 2-column CSV file, where the first column corre
  
 Usage for the Python code:
  
-	python SensationalClassifier.py -args
+	python bias_classifier.py -args
 
 	The arguments are:
 	-t, --trainset: Path to training data (if you are training a model)
